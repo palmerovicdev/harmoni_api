@@ -21,11 +21,10 @@ import java.util.function.Function;
 @RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
 
-    @Value("${jwt.secret}")
-    public String SECRET;
-
     private final HttpServletRequest httpServletRequest;
 
+    @Value("${jwt.secret}")
+    public String SECRET;
 
     @Override
     public String generateToken(String email) {
@@ -38,7 +37,7 @@ public class JwtServiceImpl implements JwtService {
                    .setClaims(claims)
                    .setSubject(email)
                    .setIssuedAt(new Date())
-                   .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
+                   .setExpiration(new Date(System.currentTimeMillis() + 365 * 24 * 60 * 60 * 1000L)) // 1 year expiration
                    .signWith(getSignKey(), SignatureAlgorithm.HS512)
                    .compact();
     }

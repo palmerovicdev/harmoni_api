@@ -52,6 +52,7 @@ public class UserInfoServiceImpl implements UserInfoService {
         repository.save(UserInfo.builder()
                                 .name(userInfo.name())
                                 .email(userInfo.email())
+                                .gender(userInfo.gender())
                                 .password(encoder.encode(userInfo.password()))
                                 .role(userInfo.role())
                                 .build());

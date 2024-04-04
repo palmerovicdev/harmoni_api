@@ -1,7 +1,9 @@
 package com.palmerodev.harmoni_api.model.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.springframework.web.multipart.MultipartFile;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record EmotionTrackMultipleRequest(MultipartFile videoFile, Long activityId) {
 
     public EmotionTrackMultipleRequest {

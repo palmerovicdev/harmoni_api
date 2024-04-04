@@ -34,6 +34,7 @@ public class UserInfo implements UserDetails {
     private String name;
     private String email;
     private String password;
+    private String gender;
 
     @Version
     private Long version;
