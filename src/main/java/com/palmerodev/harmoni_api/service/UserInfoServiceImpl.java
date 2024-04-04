@@ -63,15 +63,15 @@ public class UserInfoServiceImpl implements UserInfoService {
     @Override
     public AuthResponse login(AuthRequest authRequest) {
         var authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.username(), authRequest.password())
+                new UsernamePasswordAuthenticationToken(authRequest.name(), authRequest.password())
                                                                );
         if (authentication.isAuthenticated()) {
             return new AuthResponse(
                     "success",
                     "User authenticated successfully",
-                    jwtService.generateToken(authRequest.username()),
-                    repository.findByName(authRequest.username())
-                              .orElseThrow(() -> new UserNotFoundException("User not found: " + authRequest.username(), ""))
+                    jwtService.generateToken(authRequest.name()),
+                    repository.findByName(authRequest.name())
+                              .orElseThrow(() -> new UserNotFoundException("User not found: " + authRequest.name(), ""))
                               .getId()
             );
         } else {
