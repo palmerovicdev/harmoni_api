@@ -6,6 +6,7 @@ import com.palmerodev.harmoni_api.core.exceptions.SettingsNotFoundException;
 import com.palmerodev.harmoni_api.core.exceptions.UserNotFoundException;
 import com.palmerodev.harmoni_api.model.request.SettingsRequest;
 import com.palmerodev.harmoni_api.model.response.SettingsResponse;
+import com.palmerodev.harmoni_api.model.response.UserInfoResponse;
 import com.palmerodev.harmoni_api.repository.SettingsEntityRepository;
 import com.palmerodev.harmoni_api.repository.UserInfoRepository;
 import lombok.RequiredArgsConstructor;
@@ -47,6 +48,15 @@ public class MyProfileServiceImpl implements MyProfileService {
                                            return new SettingsResponse("success", settingsJson, "Settings updated successfully");
                                        })
                                        .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userInfo.getId(), settingsJson));
+    }
+
+    @Override
+    public UserInfoResponse getUserProfile() {
+        var userInfo = userInfoRepository.findByName(jwtService.extractUsername())
+                                         .orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
+
+        return new UserInfoResponse(userInfo.getId(), userInfo.getName(), userInfo.getEmail(), userInfo.getRole(),
+                                    userInfo.getGender());
     }
 
 }

@@ -2,6 +2,7 @@ package com.palmerodev.harmoni_api.controller;
 
 import com.palmerodev.harmoni_api.model.request.SettingsRequest;
 import com.palmerodev.harmoni_api.model.response.SettingsResponse;
+import com.palmerodev.harmoni_api.model.response.UserInfoResponse;
 import com.palmerodev.harmoni_api.service.MyProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,11 @@ public class MyProfileController {
     @GetMapping("/getSettingsForUser")
     public ResponseEntity<SettingsResponse> getSettingsForUser() {
             return ResponseEntity.ok(myProfileService.getSettingsForUser());
+    }
+
+    @GetMapping("/getUserProfile")
+    public ResponseEntity<UserInfoResponse> getUserProfile() {
+            return ResponseEntity.ok(myProfileService.getUserProfile());
     }
 
 }
