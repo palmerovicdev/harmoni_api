@@ -32,6 +32,7 @@ public class UserInfo implements UserDetails {
 
     @Column(nullable = false, unique = true)
     private String name;
+    @Column(nullable = false, unique = true)
     private String email;
     private String password;
     private String gender;

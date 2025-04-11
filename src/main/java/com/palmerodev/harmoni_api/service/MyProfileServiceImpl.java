@@ -7,6 +7,7 @@ import com.palmerodev.harmoni_api.core.exceptions.UserNotFoundException;
 import com.palmerodev.harmoni_api.model.request.SettingsRequest;
 import com.palmerodev.harmoni_api.model.response.SettingsResponse;
 import com.palmerodev.harmoni_api.model.response.UserInfoResponse;
+import com.palmerodev.harmoni_api.model.response.ValidationResponse;
 import com.palmerodev.harmoni_api.repository.SettingsEntityRepository;
 import com.palmerodev.harmoni_api.repository.UserInfoRepository;
 import lombok.RequiredArgsConstructor;
@@ -55,8 +56,19 @@ public class MyProfileServiceImpl implements MyProfileService {
         var userInfo = userInfoRepository.findByName(jwtService.extractUsername())
                                          .orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
 
-        return new UserInfoResponse(userInfo.getId(), userInfo.getName(), userInfo.getEmail(), userInfo.getRole(),
-                                    userInfo.getGender());
+        return new UserInfoResponse(
+                userInfo.getId(), userInfo.getName(), userInfo.getEmail(), userInfo.getRole(),
+                userInfo.getGender());
+    }
+
+    @Override
+    public ValidationResponse validateEmail(String email) {
+        return new ValidationResponse(userInfoRepository.existsByEmail(email));
+    }
+
+    @Override
+    public ValidationResponse validateName(String name) {
+        return new ValidationResponse(userInfoRepository.existsByName(name));
     }
 
 }
