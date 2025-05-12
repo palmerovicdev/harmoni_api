@@ -71,4 +71,19 @@ public class MyProfileServiceImpl implements MyProfileService {
         return new ValidationResponse(userInfoRepository.existsByName(name));
     }
 
+    @Override
+    public UserInfoResponse updateUserProfile(UserInfoResponse userInfo) {
+        var existingUser = userInfoRepository.findById(userInfo.id())
+                                             .orElseThrow(() -> new UserNotFoundException("User not found", "ID: " + userInfo.id()));
+
+        existingUser.setName(userInfo.name());
+        existingUser.setEmail(userInfo.email());
+        existingUser.setGender(userInfo.gender());
+        existingUser.setRole(userInfo.role());
+        userInfoRepository.save(existingUser);
+        return new UserInfoResponse(
+                existingUser.getId(), existingUser.getName(), existingUser.getEmail(),
+                existingUser.getRole(), existingUser.getGender());
+    }
+
 }
