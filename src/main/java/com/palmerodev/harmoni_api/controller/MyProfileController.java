@@ -31,6 +31,11 @@ public class MyProfileController {
         return ResponseEntity.ok(myProfileService.getUserProfile());
     }
 
+    @PostMapping("/update")
+    public ResponseEntity<UserInfoResponse> updateUserProfile(@RequestBody UserInfoResponse userInfo) {
+        return ResponseEntity.ok(myProfileService.updateUserProfile(userInfo));
+    }
+
     @GetMapping("/validateEmail/{email}")
     public ResponseEntity<ValidationResponse> validateEmail(@PathVariable String email) {
         var isValid = myProfileService.validateEmail(email);
