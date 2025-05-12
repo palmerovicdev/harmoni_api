@@ -17,4 +17,5 @@ public interface MyProfileService {
 
     ValidationResponse validateName(String name);
 
+    UserInfoResponse updateUserProfile(UserInfoResponse userInfo);
 }
