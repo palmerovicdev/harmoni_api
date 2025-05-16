@@ -1,6 +1,7 @@
 package com.palmerodev.harmoni_api.controller;
 
 import com.palmerodev.harmoni_api.model.request.SettingsRequest;
+import com.palmerodev.harmoni_api.model.request.UserInfoRequest;
 import com.palmerodev.harmoni_api.model.response.SettingsResponse;
 import com.palmerodev.harmoni_api.model.response.UserInfoResponse;
 import com.palmerodev.harmoni_api.model.response.ValidationResponse;
@@ -32,8 +33,13 @@ public class MyProfileController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<UserInfoResponse> updateUserProfile(@RequestBody UserInfoResponse userInfo) {
+    public ResponseEntity<UserInfoResponse> updateUserProfile(@RequestBody UserInfoRequest userInfo) {
         return ResponseEntity.ok(myProfileService.updateUserProfile(userInfo));
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Boolean> deleteUserProfile() {
+        return ResponseEntity.ok(myProfileService.deleteUserProfile());
     }
 
     @GetMapping("/validateEmail/{email}")
