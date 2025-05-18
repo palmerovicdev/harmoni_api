@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palmerodev.harmoni_api.core.exceptions.SettingsNotFoundException;
 import com.palmerodev.harmoni_api.core.exceptions.UserNotFoundException;
 import com.palmerodev.harmoni_api.model.request.SettingsRequest;
+import com.palmerodev.harmoni_api.model.request.UserInfoRequest;
 import com.palmerodev.harmoni_api.model.response.SettingsResponse;
 import com.palmerodev.harmoni_api.model.response.UserInfoResponse;
 import com.palmerodev.harmoni_api.model.response.ValidationResponse;
@@ -72,7 +73,7 @@ public class MyProfileServiceImpl implements MyProfileService {
     }
 
     @Override
-    public UserInfoResponse updateUserProfile(UserInfoResponse userInfo) {
+    public UserInfoResponse updateUserProfile(UserInfoRequest userInfo) {
         var existingUser = userInfoRepository.findById(userInfo.id())
                                              .orElseThrow(() -> new UserNotFoundException("User not found", "ID: " + userInfo.id()));
 
@@ -84,6 +85,12 @@ public class MyProfileServiceImpl implements MyProfileService {
         return new UserInfoResponse(
                 existingUser.getId(), existingUser.getName(), existingUser.getEmail(),
                 existingUser.getRole(), existingUser.getGender());
+    }
+
+    @Override
+    public boolean deleteUserProfile() {
+        userInfoRepository.delete(userInfoRepository.findByName(jwtService.extractUsername()).orElseThrow(() -> new UserNotFoundException("User not found", "")));
+        return true;
     }
 
 }
