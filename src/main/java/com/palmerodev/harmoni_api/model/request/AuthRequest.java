@@ -1,15 +1,9 @@
 package com.palmerodev.harmoni_api.model.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+public interface AuthRequest {
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class AuthRequest {
+    String getPassword();
 
-    private String username;
-    private String password;
+    String getUsername();
 
 }

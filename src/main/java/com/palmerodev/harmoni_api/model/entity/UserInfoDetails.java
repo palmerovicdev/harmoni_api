@@ -11,17 +11,17 @@ import java.util.stream.Collectors;
 
 public class UserInfoDetails implements UserDetails {
 
-    private String username; // Changed from 'name' to 'email' for clarity
-    private String password;
-    private List<GrantedAuthority> authorities;
+    private final String username;
+    private final String password;
+    private final List<GrantedAuthority> authorities;
 
     public UserInfoDetails(UserInfo userInfo) {
         this.username = userInfo.getEmail(); // Use email as username
         this.password = userInfo.getPassword();
         this.authorities = List.of(userInfo.getRoles().split(","))
-                .stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+                               .stream()
+                               .map(SimpleGrantedAuthority::new)
+                               .collect(Collectors.toList());
     }
 
     @Override
@@ -58,4 +58,5 @@ public class UserInfoDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }
