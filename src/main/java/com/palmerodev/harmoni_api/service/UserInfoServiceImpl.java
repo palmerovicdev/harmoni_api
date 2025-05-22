@@ -1,6 +1,8 @@
 package com.palmerodev.harmoni_api.service;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palmerodev.harmoni_api.core.exceptions.UserAlreadyExistException;
 import com.palmerodev.harmoni_api.core.exceptions.UserNotFoundException;
 import com.palmerodev.harmoni_api.model.entity.UserInfo;
@@ -31,12 +33,14 @@ public class UserInfoServiceImpl implements UserInfoService {
 
     private final AuthenticationManager authenticationManager;
 
+    private final ObjectMapper objectMapper;
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Optional<UserInfo> userDetail = repository.findByEmail(username);
 
         return userDetail.map(UserInfoDetails::new)
-                         .orElseThrow(() -> new UserNotFoundException("User not found: " + username));
+                         .orElseThrow(() -> new UserNotFoundException("User not found: " + username, ""));
     }
 
     @Override
@@ -49,7 +53,11 @@ public class UserInfoServiceImpl implements UserInfoService {
                 userInfo.getRoles()
         );
         if (repository.findByEmail(userInfoData.getEmail()).isPresent()) {
-            throw new UserAlreadyExistException("User already exists");
+            try {
+                throw new UserAlreadyExistException("User already exists", objectMapper.writeValueAsString(userInfoData));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
         userInfoData.setPassword(encoder.encode(userInfoData.getPassword()));
         repository.save(userInfoData);
@@ -74,7 +82,11 @@ public class UserInfoServiceImpl implements UserInfoService {
         if (authentication.isAuthenticated()) {
             return jwtService.generateToken(authRequest.getUsername());
         } else {
-            throw new UserNotFoundException("Invalid user request!");
+            try {
+                throw new UserNotFoundException("Invalid user request!", objectMapper.writeValueAsString(authRequest));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
