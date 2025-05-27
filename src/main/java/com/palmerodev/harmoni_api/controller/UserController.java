@@ -2,6 +2,7 @@ package com.palmerodev.harmoni_api.controller;
 
 import com.palmerodev.harmoni_api.model.request.AuthRequest;
 import com.palmerodev.harmoni_api.model.request.UserInfoRequest;
+import com.palmerodev.harmoni_api.model.response.AuthResponse;
 import com.palmerodev.harmoni_api.service.UserInfoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +19,12 @@ public class UserController {
     private final UserInfoService service;
 
     @PostMapping("/signUp")
-    public ResponseEntity<String> signUp(@RequestBody UserInfoRequest userInfo) {
+    public ResponseEntity<AuthResponse> signUp(@RequestBody UserInfoRequest userInfo) {
         return ResponseEntity.ok(service.signUp(userInfo));
     }
 
     @PostMapping("/signIn")
-    public ResponseEntity<String> signIn(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<AuthResponse> signIn(@RequestBody AuthRequest authRequest) {
         return ResponseEntity.ok(service.login(authRequest));
     }
 

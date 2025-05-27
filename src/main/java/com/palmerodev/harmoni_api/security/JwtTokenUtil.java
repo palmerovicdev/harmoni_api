@@ -46,7 +46,7 @@ public class JwtTokenUtil implements Serializable {
     public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
 
 
-        final Claims claims = getAllClaimsFromToken(token);
+        final var claims = getAllClaimsFromToken(token);
 
         return claimsResolver.apply(claims);
 
@@ -91,7 +91,7 @@ public class JwtTokenUtil implements Serializable {
 
     private Boolean isTokenExpired(String token) {
 
-        final Date expiration = getExpirationDateFromToken(token);
+        final var expiration = getExpirationDateFromToken(token);
 
         return expiration.before(new Date());
 
@@ -115,7 +115,7 @@ public class JwtTokenUtil implements Serializable {
     public Boolean validateToken(String token, UserDetails userDetails) {
 
 
-        final String username = getUsernameFromToken(token);
+        final var username = getUsernameFromToken(token);
 
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
 

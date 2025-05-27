@@ -8,6 +8,7 @@ import com.palmerodev.harmoni_api.core.exceptions.UserNotFoundException;
 import com.palmerodev.harmoni_api.model.entity.UserInfo;
 import com.palmerodev.harmoni_api.model.request.AuthRequest;
 import com.palmerodev.harmoni_api.model.request.UserInfoRequest;
+import com.palmerodev.harmoni_api.model.response.AuthResponse;
 import com.palmerodev.harmoni_api.repository.UserInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,7 +39,7 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public String signUp(UserInfoRequest userInfo) {
+    public AuthResponse signUp(UserInfoRequest userInfo) {
         if (repository.findByName(userInfo.email()).isPresent()) {
             try {
                 throw new UserAlreadyExistException("User already exists", objectMapper.writeValueAsString(userInfo));
@@ -58,12 +59,15 @@ public class UserInfoServiceImpl implements UserInfoService {
     }
 
     @Override
-    public String login(AuthRequest authRequest) {
+    public AuthResponse login(AuthRequest authRequest) {
         var authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.username(), authRequest.password())
                                                                );
         if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(authRequest.username());
+            return new AuthResponse("success",
+                    "User authenticated successfully",
+                    jwtService.generateToken(authRequest.username())
+            );
         } else {
             try {
                 throw new UserNotFoundException("Invalid user request!", objectMapper.writeValueAsString(authRequest));

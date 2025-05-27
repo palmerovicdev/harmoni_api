@@ -36,7 +36,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Key getSignKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
+        var keyBytes = Decoders.BASE64.decode(SECRET);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -52,7 +52,7 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
-        final Claims claims = extractAllClaims(token);
+        final var claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
