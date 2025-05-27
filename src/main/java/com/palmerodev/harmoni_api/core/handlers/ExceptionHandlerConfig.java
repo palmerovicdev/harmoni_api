@@ -2,10 +2,8 @@ package com.palmerodev.harmoni_api.core.handlers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.palmerodev.harmoni_api.core.exceptions.PrimaryException;
-import com.palmerodev.harmoni_api.core.exceptions.UserAlreadyExistException;
-import com.palmerodev.harmoni_api.core.exceptions.UserNotFoundException;
-import com.palmerodev.harmoni_api.model.response.AuthResponse;
+import com.palmerodev.harmoni_api.core.exceptions.*;
+import com.palmerodev.harmoni_api.model.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -17,8 +15,8 @@ import java.util.List;
 public class ExceptionHandlerConfig {
 
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<AuthResponse> handleUserNotFound(UserNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new AuthResponse("error", getMessage(ex)));
+    public ResponseEntity<ErrorResponse> handleUserNotFound(UserNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("error", getMessage(ex)));
     }
 
     private static String getMessage(PrimaryException ex) {
@@ -33,8 +31,17 @@ public class ExceptionHandlerConfig {
     }
 
     @ExceptionHandler(UserAlreadyExistException.class)
-    public ResponseEntity<AuthResponse> handleUserAlreadyExist(UserAlreadyExistException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(new AuthResponse("error", getMessage(ex)));
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExist(UserAlreadyExistException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse("error", getMessage(ex)));
     }
 
+    @ExceptionHandler(AuthLogicException.class)
+    public ResponseEntity<ErrorResponse> handleAuthLogicException(AuthLogicException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("error", getMessage(ex)));
+    }
+
+    @ExceptionHandler(SettingsNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleSettingsNotFound(SettingsNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("error", getMessage(ex)));
+    }
 }

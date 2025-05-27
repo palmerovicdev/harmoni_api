@@ -7,8 +7,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface SettingsEntityRepository extends JpaRepository<SettingsEntity, Integer> {
+public interface SettingsEntityRepository extends JpaRepository<SettingsEntity, Long> {
 
-    Optional<SettingsEntity> findByUserInfoIdId(Integer userId);
+    Optional<SettingsEntity> findByUserInfoIdId(Long userId);
 
 }

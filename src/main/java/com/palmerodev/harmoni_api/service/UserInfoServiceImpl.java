@@ -3,6 +3,7 @@ package com.palmerodev.harmoni_api.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.palmerodev.harmoni_api.core.exceptions.AuthLogicException;
 import com.palmerodev.harmoni_api.core.exceptions.UserAlreadyExistException;
 import com.palmerodev.harmoni_api.core.exceptions.UserNotFoundException;
 import com.palmerodev.harmoni_api.model.entity.UserInfo;
@@ -44,7 +45,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             try {
                 throw new UserAlreadyExistException("User already exists", objectMapper.writeValueAsString(userInfo));
             } catch (JsonProcessingException e) {
-                throw new RuntimeException(e);
+                throw new AuthLogicException("Error processing user info", e.toString());
             }
         }
 

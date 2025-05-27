@@ -2,8 +2,13 @@ package com.palmerodev.harmoni_api.model.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.proxy.HibernateProxy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
+import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
@@ -16,7 +21,7 @@ public class SettingsEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
     @Column(columnDefinition = "json")
     private String settingsJson;
@@ -24,6 +29,14 @@ public class SettingsEntity {
     @ManyToOne(cascade = CascadeType.ALL, targetEntity = UserInfo.class)
     @JoinColumn(name = "user_id")
     private UserInfo userInfoId;
+
+    @CreatedDate
+    @CreationTimestamp
+    private Timestamp createdAt;
+
+    @LastModifiedDate
+    @UpdateTimestamp
+    private Timestamp updatedAt;
 
     @Override
     public final boolean equals(Object o) {
