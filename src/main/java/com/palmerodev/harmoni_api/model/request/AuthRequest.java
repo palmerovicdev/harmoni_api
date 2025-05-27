@@ -1,9 +1,4 @@
 package com.palmerodev.harmoni_api.model.request;
 
-public interface AuthRequest {
-
-    String getPassword();
-
-    String getUsername();
-
+public record AuthRequest(String username, String password) {
 }

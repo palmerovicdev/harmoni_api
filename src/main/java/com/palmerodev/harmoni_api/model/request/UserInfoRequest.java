@@ -1,15 +1,11 @@
 package com.palmerodev.harmoni_api.model.request;
 
-public interface UserInfoRequest {
+import com.palmerodev.harmoni_api.model.enums.Role;
 
-    String getId();
-
-    String getName();
-
-    String getEmail();
-
-    String getPassword();
-
-    String getRoles();
+public record UserInfoRequest(Integer id,
+                              String name,
+                              String email,
+                              String password,
+                              Role role) {
 
 }

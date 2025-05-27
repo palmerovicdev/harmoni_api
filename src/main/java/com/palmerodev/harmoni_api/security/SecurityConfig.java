@@ -1,5 +1,9 @@
 package com.palmerodev.harmoni_api.security;
 
+import com.palmerodev.harmoni_api.core.exceptions.UserNotFoundException;
+import com.palmerodev.harmoni_api.model.enums.Permission;
+import com.palmerodev.harmoni_api.repository.UserInfoRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -18,17 +22,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilterImpl;
-    private final UserDetailsService userDetailsService;
+    private final UserInfoRepository userInfoRepository;
 
-    public SecurityConfig(
-            JwtAuthFilter jwtAuthFilterImpl,
-            UserDetailsService userDetailsService) {
-        this.jwtAuthFilterImpl = jwtAuthFilterImpl;
-        this.userDetailsService = userDetailsService;
-    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,9 +37,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                                                .requestMatchers("/auth/signUp", "/auth/signIn").permitAll()
 
-                                               .requestMatchers("/myProfile/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN")
-                                               .requestMatchers("/auth/user/**").hasAuthority("ROLE_USER")
-                                               .requestMatchers("/auth/admin/**").hasAuthority("ROLE_ADMIN")
+                                               .requestMatchers("/myProfile/**").hasAnyAuthority(Permission.CUSTOMER.name())
+                                               .requestMatchers("/auth/user/**").hasAuthority(Permission.CUSTOMER.name())
+                                               .requestMatchers("/auth/admin/**").hasAuthority(Permission.ROOT.name())
 
                                                .anyRequest().authenticated()
                                       )
@@ -57,7 +56,7 @@ public class SecurityConfig {
     @Bean
     public AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService);
+        provider.setUserDetailsService(userDetailsService());
         provider.setPasswordEncoder(passwordEncoder());
         return provider;
     }
@@ -70,6 +69,11 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
+    }
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> userInfoRepository.findByName(username).orElseThrow(() -> new UserNotFoundException("User Not Found", ""));
     }
 
 }

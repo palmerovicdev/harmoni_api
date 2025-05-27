@@ -1,5 +1,7 @@
 package com.palmerodev.harmoni_api.security;
 
+import com.palmerodev.harmoni_api.core.exceptions.UserNotFoundException;
+import com.palmerodev.harmoni_api.repository.UserInfoRepository;
 import com.palmerodev.harmoni_api.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 
@@ -18,12 +19,12 @@ import java.io.IOException;
 @Component
 public class JwtAuthFilterImpl extends JwtAuthFilter {
 
-    private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
+    private final UserInfoRepository userInfoRepository;
 
     @Autowired
-    public JwtAuthFilterImpl(UserDetailsService userDetailsService, JwtService jwtService) {
-        this.userDetailsService = userDetailsService;
+    public JwtAuthFilterImpl(JwtService jwtService, UserInfoRepository userInfoRepository) {
+        this.userInfoRepository = userInfoRepository;
         this.jwtService = jwtService;
     }
 
@@ -31,15 +32,15 @@ public class JwtAuthFilterImpl extends JwtAuthFilter {
     public void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");
         String token = null;
-        String username = null;
+        String username;
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
             username = jwtService.extractUsername(token);
-        }
+        } else {username = null;}
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = userInfoRepository.findByName(username).orElseThrow(() -> new UserNotFoundException("User not found: " + username, ""));
             if (jwtService.validateToken(token, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
