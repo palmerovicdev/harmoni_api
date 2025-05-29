@@ -26,6 +26,8 @@ public class ActivityEntity {
 
     private String name;
 
+    private String color;
+
     @CreatedDate
     @CreationTimestamp
     private Timestamp createdAt;

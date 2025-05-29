@@ -25,7 +25,7 @@ public class MyProfileServiceImpl implements MyProfileService {
 
     @Override
     public SettingsResponse saveSettingsForUser(SettingsRequest request) {
-            String settingsJson;
+        String settingsJson;
         try {
             settingsJson = new ObjectMapper().writeValueAsString(request.settings());
         } catch (JsonProcessingException e) {

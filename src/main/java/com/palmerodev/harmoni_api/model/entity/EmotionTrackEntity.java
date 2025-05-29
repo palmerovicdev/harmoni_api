@@ -19,6 +19,7 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Builder
 public class EmotionTrackEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -48,4 +49,5 @@ public class EmotionTrackEntity {
     @LastModifiedDate
     @UpdateTimestamp
     private Timestamp updatedAt;
+
 }

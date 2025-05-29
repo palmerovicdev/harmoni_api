@@ -65,7 +65,8 @@ public class UserInfoServiceImpl implements UserInfoService {
                 new UsernamePasswordAuthenticationToken(authRequest.username(), authRequest.password())
                                                                );
         if (authentication.isAuthenticated()) {
-            return new AuthResponse("success",
+            return new AuthResponse(
+                    "success",
                     "User authenticated successfully",
                     jwtService.generateToken(authRequest.username())
             );

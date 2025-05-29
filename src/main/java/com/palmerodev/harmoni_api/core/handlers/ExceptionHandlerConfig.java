@@ -44,4 +44,5 @@ public class ExceptionHandlerConfig {
     public ResponseEntity<ErrorResponse> handleSettingsNotFound(SettingsNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("error", getMessage(ex)));
     }
+
 }
