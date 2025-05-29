@@ -26,6 +26,7 @@ public class EmotionApiClientImpl implements EmotionApiClient {
         this.restTemplate = new RestTemplate();
         this.baseUrl = baseUrl;
     }
+
     public void testAnalyzeAudioBlockFromFile() {
         File testFile = new File("/Volumes/TuMaletin/Victor/00-Tesis/emotion_recognition_API/test_data/Anger_C_A_abajo.wav");
 
@@ -38,6 +39,7 @@ public class EmotionApiClientImpl implements EmotionApiClient {
         } catch (Exception e) {
         }
     }
+
     @Override
     public List<EmotionRecordResponse> analyzeAudioBlocks(List<File> audioBlocks) {
         List<EmotionRecordResponse> emotionRecords = new ArrayList<>(); // To store results
@@ -79,4 +81,5 @@ public class EmotionApiClientImpl implements EmotionApiClient {
         }
         return emotionRecords;
     }
+
 }
