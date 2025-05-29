@@ -8,5 +8,7 @@ import java.util.List;
 public interface EmotionApiClient {
 
     List<EmotionRecordResponse> analyzeAudioBlocks(List<File> audioBlocks);
+
     void testAnalyzeAudioBlockFromFile();
+
 }
