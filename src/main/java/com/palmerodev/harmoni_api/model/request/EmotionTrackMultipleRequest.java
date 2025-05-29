@@ -14,4 +14,5 @@ public record EmotionTrackMultipleRequest(MultipartFile videoFile, Long activity
             throw new IllegalArgumentException("Activity ID must be a positive number");
         }
     }
+
 }
