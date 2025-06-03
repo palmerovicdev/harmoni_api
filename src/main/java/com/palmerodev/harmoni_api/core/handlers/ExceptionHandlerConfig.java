@@ -35,6 +35,11 @@ public class ExceptionHandlerConfig {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ErrorResponse("error", getMessage(ex)));
     }
 
+    @ExceptionHandler(ActivityNotFoundException.class)
+    public  ResponseEntity<ErrorResponse> handleActivityNotFound(ActivityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("error", getMessage(ex)));
+    }
+
     @ExceptionHandler(AuthLogicException.class)
     public ResponseEntity<ErrorResponse> handleAuthLogicException(AuthLogicException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("error", getMessage(ex)));
