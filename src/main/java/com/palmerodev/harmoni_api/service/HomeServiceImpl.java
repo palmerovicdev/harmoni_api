@@ -34,13 +34,15 @@ public class HomeServiceImpl implements HomeService {
 
     @Override
     public ActivityResponse getActivities() {
-        var userInfo = userInfoRepository.findByName(jwtService.extractUsername()).orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
+        var userInfo = userInfoRepository.findByName(jwtService.extractUsername())
+                                         .orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
         return new ActivityResponse("success", activityEntityRepository.findAllByUserInfo(userInfo));
     }
 
     @Override
     public ActivityResponse createActivities(ActivityListRequest activityRequest) {
-        var userInfo = userInfoRepository.findByName(jwtService.extractUsername()).orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
+        var userInfo = userInfoRepository.findByName(jwtService.extractUsername())
+                                         .orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
 
         activityEntityRepository
                 .saveAllAndFlush(activityRequest
@@ -68,7 +70,8 @@ public class HomeServiceImpl implements HomeService {
     @Override
     public EmotionTrackResponse createEmotionTrack(EmotionTrackMultipleRequest emotionTrackRequest) {
 
-        var userInfo = userInfoRepository.findByName(jwtService.extractUsername()).orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
+        var userInfo = userInfoRepository.findByName(jwtService.extractUsername())
+                                         .orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
 
         var activity = activityEntityRepository.findById(emotionTrackRequest.activityId())
                                                .orElseThrow(() -> new ActivityNotFoundException("Activity not found"));
@@ -119,7 +122,8 @@ public class HomeServiceImpl implements HomeService {
 
     @Override
     public List<EmotionTrackResponse> getEmotionTracksByActivity(Long activityId) {
-        var userInfo = userInfoRepository.findByName(jwtService.extractUsername()).orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
+        var userInfo = userInfoRepository.findByName(jwtService.extractUsername())
+                                         .orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
 
 
         var activity = activityEntityRepository.findById(activityId)
@@ -136,7 +140,8 @@ public class HomeServiceImpl implements HomeService {
 
     @Override
     public List<EmotionTrackResponse> getEmotionTracks() {
-        var userInfo = userInfoRepository.findByName(jwtService.extractUsername()).orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
+        var userInfo = userInfoRepository.findByName(jwtService.extractUsername())
+                                         .orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
 
 
         return emotionTrackEntityRepository.findByUserInfo(userInfo)
