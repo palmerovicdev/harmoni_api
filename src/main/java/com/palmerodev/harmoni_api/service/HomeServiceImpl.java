@@ -1,5 +1,6 @@
 package com.palmerodev.harmoni_api.service;
 
+import com.palmerodev.harmoni_api.core.exceptions.ActivityNotFoundException;
 import com.palmerodev.harmoni_api.core.exceptions.SegmentationException;
 import com.palmerodev.harmoni_api.core.exceptions.UserNotFoundException;
 import com.palmerodev.harmoni_api.helper.EmotionApiClient;
@@ -67,7 +68,7 @@ public class HomeServiceImpl implements HomeService {
         var user = userInfoRepository.findById(emotionTrackRequest.userId())
                                      .orElseThrow(() -> new UserNotFoundException("User not found", "" + emotionTrackRequest.userId()));
         var activity = activityEntityRepository.findById(emotionTrackRequest.activityId())
-                                               .orElseThrow(() -> new SegmentationException("Activity not found")); //TODO 5/30/25 palmerodev : change the exception to a more specific one
+                                               .orElseThrow(() -> new ActivityNotFoundException("Activity not found"));
 
 
         List<BufferedImage> frames;
@@ -94,7 +95,7 @@ public class HomeServiceImpl implements HomeService {
         var emotionRecords = emotionApiClient.analyzeAudioBlocks(audioBlocks);
         for (var record : emotionRecords) {
             if (record.predictions().isEmpty()) {
-                throw new SegmentationException("No predictions returned from emotion API"); //TODO 5/30/25 palmerodev : change the exception to a more specific one
+                throw new ActivityNotFoundException("No predictions returned from emotion API");
             }
         }
 
@@ -141,7 +142,7 @@ public class HomeServiceImpl implements HomeService {
         var user = userInfoRepository.findById(userId)
                                      .orElseThrow(() -> new UserNotFoundException("User not found", "" + userId));
         var activity = activityEntityRepository.findById(activityId)
-                                               .orElseThrow(() -> new SegmentationException("Activity not found")); //TODO 5/30/25 palmerodev : change the exception to a more specific one
+                                               .orElseThrow(() -> new ActivityNotFoundException("Activity not found"));
         return emotionTrackEntityRepository.findByUserInfoAndActivity(user, activity).stream()
                                            .map(emotionTrack -> new EmotionTrackResponse(
                                                    emotionTrack.getPercentage(),
