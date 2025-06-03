@@ -5,7 +5,7 @@ import com.palmerodev.harmoni_api.model.response.SettingsResponse;
 
 public interface MyProfileService {
 
-    SettingsResponse getSettingsForUser(Long userId);
+    SettingsResponse getSettingsForUser();
 
     SettingsResponse saveSettingsForUser(SettingsRequest request);
 

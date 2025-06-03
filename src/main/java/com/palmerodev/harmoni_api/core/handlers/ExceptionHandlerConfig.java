@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 @ControllerAdvice
@@ -20,8 +22,10 @@ public class ExceptionHandlerConfig {
     }
 
     private static String getMessage(PrimaryException ex) {
-        var className = ex.getStackTrace()[0].getClassName();
-        var methodName = "Timestamp : " + ex.getStackTrace()[0].getMethodName();
+        var classNameArr = ex.getStackTrace()[0].getClassName().split("\\.");
+        var className = classNameArr[classNameArr.length - 1];
+        var methodName = ex.getStackTrace()[0].getMethodName();
+        methodName = methodName.substring(methodName.indexOf("$") + 1, methodName.lastIndexOf("$")) + " at " + Timestamp.from(Instant.now());
         var data = "AdditionalData : " + List.of(System.currentTimeMillis() + "", ex.getJsonAdditionalData());
         try {
             return className + "::" + methodName + " -> " + ex.getMessage() + " --- " + new ObjectMapper().writeValueAsString(data);
@@ -36,7 +40,7 @@ public class ExceptionHandlerConfig {
     }
 
     @ExceptionHandler(ActivityNotFoundException.class)
-    public  ResponseEntity<ErrorResponse> handleActivityNotFound(ActivityNotFoundException ex) {
+    public ResponseEntity<ErrorResponse> handleActivityNotFound(ActivityNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("error", getMessage(ex)));
     }
 
@@ -48,6 +52,16 @@ public class ExceptionHandlerConfig {
     @ExceptionHandler(SettingsNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleSettingsNotFound(SettingsNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse("error", getMessage(ex)));
+    }
+
+    @ExceptionHandler(SegmentationException.class)
+    public ResponseEntity<ErrorResponse> handleSegmentationException(SegmentationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("error", getMessage(ex)));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ErrorResponse("error", ex.getMessage()));
     }
 
 }

@@ -20,31 +20,38 @@ public class HomeController {
 
     @GetMapping("/activities")
     public ResponseEntity<ActivityResponse> activities() {
-        return ResponseEntity.ok(homeService.getActivities());
+        var response = homeService.getActivities();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/createActivity")
     public ResponseEntity<ActivityResponse> createActivity(@RequestBody ActivityListRequest request) {
-        return ResponseEntity.ok(homeService.createActivities(request));
+        var response = homeService.createActivities(request);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/deleteActivity/{id}")
     public ResponseEntity<ActivityResponse> deleteActivity(@PathVariable Long id) {
-        return ResponseEntity.ok(homeService.deleteActivity(id));
+        var response = homeService.deleteActivity(id);
+        return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/trackEmotion")
-    public ResponseEntity<EmotionTrackResponse> trackEmotion(@RequestBody EmotionTrackMultipleRequest request) {
-        return ResponseEntity.ok(homeService.createEmotionTrack(request));
+    @PostMapping(path = "/trackEmotion", consumes = {"multipart/form-data", "multipart/form-data;charset=UTF-8"})
+    public ResponseEntity<EmotionTrackResponse> trackEmotion(@ModelAttribute EmotionTrackMultipleRequest request) {
+        var response = homeService.createEmotionTrack(request);
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/emotionsByActivity/{userId}/{activityId}")
-    public ResponseEntity<List<EmotionTrackResponse>> emotionsByActivity(@PathVariable Long userId, @PathVariable Long activityId) {
-        return ResponseEntity.ok(homeService.getEmotionTracksByActivity(userId, activityId));
+    @GetMapping("/emotionsByActivity/{activityId}")
+    public ResponseEntity<List<EmotionTrackResponse>> emotionsByActivity(@PathVariable Long activityId) {
+        var response = homeService.getEmotionTracksByActivity(activityId);
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/emotions/{userId}")
-    public ResponseEntity<List<EmotionTrackResponse>> emotions(@PathVariable Long userId) {
-        return ResponseEntity.ok(homeService.getEmotionTracks(userId));
+    @GetMapping("/emotions")
+    public ResponseEntity<List<EmotionTrackResponse>> emotions() {
+        var response = homeService.getEmotionTracks();
+        return ResponseEntity.ok(response);
     }
+
 }

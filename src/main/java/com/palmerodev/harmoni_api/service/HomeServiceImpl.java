@@ -18,7 +18,7 @@ import com.palmerodev.harmoni_api.repository.UserInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.List;
 
 @Service
@@ -30,15 +30,18 @@ public class HomeServiceImpl implements HomeService {
     private final UserInfoRepository userInfoRepository;
     private final VideoSegmenter videoSegmenter;
     private final EmotionApiClient emotionApiClient;
+    private final JwtService jwtService;
 
     @Override
     public ActivityResponse getActivities() {
-        return new ActivityResponse("success", activityEntityRepository.findAll());
+        var userInfo = userInfoRepository.findByName(jwtService.extractUsername()).orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
+        return new ActivityResponse("success", activityEntityRepository.findAllByUserInfo(userInfo));
     }
 
     @Override
     public ActivityResponse createActivities(ActivityListRequest activityRequest) {
-        var user = userInfoRepository.findById(activityRequest.userId()).orElseThrow(() -> new UserNotFoundException("User not found", "" + activityRequest.userId()));
+        var userInfo = userInfoRepository.findByName(jwtService.extractUsername()).orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
+
         activityEntityRepository
                 .saveAllAndFlush(activityRequest
                                          .activities()
@@ -49,7 +52,7 @@ public class HomeServiceImpl implements HomeService {
                                                  act.color(),
                                                  null,
                                                  null,
-                                                 user))
+                                                 userInfo))
                                          .toList());
         return new ActivityResponse(
                 "success",
@@ -65,41 +68,20 @@ public class HomeServiceImpl implements HomeService {
     @Override
     public EmotionTrackResponse createEmotionTrack(EmotionTrackMultipleRequest emotionTrackRequest) {
 
-        var user = userInfoRepository.findById(emotionTrackRequest.userId())
-                                     .orElseThrow(() -> new UserNotFoundException("User not found", "" + emotionTrackRequest.userId()));
+        var userInfo = userInfoRepository.findByName(jwtService.extractUsername()).orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
+
         var activity = activityEntityRepository.findById(emotionTrackRequest.activityId())
                                                .orElseThrow(() -> new ActivityNotFoundException("Activity not found"));
 
-
-        List<BufferedImage> frames;
-        try {
-            frames = videoSegmenter.extractFrames(emotionTrackRequest.videoFile());
-        } catch (Exception e) {
-            throw new SegmentationException("Error extracting frames from video");
-        }
-
-        List<byte[]> audioBlocks;
+        List<File> audioBlocks;
         try {
             audioBlocks = videoSegmenter.extractAudioBlocks(emotionTrackRequest.videoFile());
         } catch (Exception e) {
             throw new SegmentationException("Error extracting audio from video");
         }
 
-        if (frames.isEmpty() || audioBlocks.isEmpty()) {
-            throw new SegmentationException("No frames or audio blocks extracted from video");
-        }
-
-        // Call endpoint to process frames
-
-        // If we have more than 1 audio then we need to call the endpoint for each audio block and select the result with the highest percentage in the data returned
         var emotionRecords = emotionApiClient.analyzeAudioBlocks(audioBlocks);
-        for (var record : emotionRecords) {
-            if (record.predictions().isEmpty()) {
-                throw new ActivityNotFoundException("No predictions returned from emotion API");
-            }
-        }
 
-        // select the prediction with the highest percentage
         String label = "";
         double maxProbability = 0.0;
         for (var emotion : emotionRecords) {
@@ -111,7 +93,6 @@ public class HomeServiceImpl implements HomeService {
             }
         }
 
-        //TODO 5/30/25 palmerodev : add the code to get the label and the max probability from the emotionImages and compare it with the audio blocks ones
 
         var emotionTrack = emotionTrackEntityRepository.saveAndFlush(
                 new com.palmerodev.harmoni_api.model.entity.EmotionTrackEntity(
@@ -119,14 +100,13 @@ public class HomeServiceImpl implements HomeService {
                         maxProbability,
                         EmotionTrackType.VOICE_AND_IMAGES,
                         EmotionType.fromString(label),
-                        user,
+                        userInfo,
                         activity,
                         null,
                         null
                 )
                                                                     );
 
-        // Save the emotion track to the database
         var finalEmotionTrack = emotionTrackEntityRepository.saveAndFlush(emotionTrack);
 
         return new EmotionTrackResponse(
@@ -138,12 +118,14 @@ public class HomeServiceImpl implements HomeService {
     }
 
     @Override
-    public List<EmotionTrackResponse> getEmotionTracksByActivity(Long userId, Long activityId) {
-        var user = userInfoRepository.findById(userId)
-                                     .orElseThrow(() -> new UserNotFoundException("User not found", "" + userId));
+    public List<EmotionTrackResponse> getEmotionTracksByActivity(Long activityId) {
+        var userInfo = userInfoRepository.findByName(jwtService.extractUsername()).orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
+
+
         var activity = activityEntityRepository.findById(activityId)
                                                .orElseThrow(() -> new ActivityNotFoundException("Activity not found"));
-        return emotionTrackEntityRepository.findByUserInfoAndActivity(user, activity).stream()
+
+        return emotionTrackEntityRepository.findByUserInfoAndActivity(userInfo, activity).stream()
                                            .map(emotionTrack -> new EmotionTrackResponse(
                                                    emotionTrack.getPercentage(),
                                                    emotionTrack.getEmotionTrackType(),
@@ -153,10 +135,11 @@ public class HomeServiceImpl implements HomeService {
     }
 
     @Override
-    public List<EmotionTrackResponse> getEmotionTracks(Long userId) {
-        var user = userInfoRepository.findById(userId)
-                                     .orElseThrow(() -> new UserNotFoundException("User not found", "" + userId));
-        return emotionTrackEntityRepository.findByUserInfo(user)
+    public List<EmotionTrackResponse> getEmotionTracks() {
+        var userInfo = userInfoRepository.findByName(jwtService.extractUsername()).orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
+
+
+        return emotionTrackEntityRepository.findByUserInfo(userInfo)
                                            .stream()
                                            .map(emotionTrack -> new EmotionTrackResponse(
                                                    emotionTrack.getPercentage(),

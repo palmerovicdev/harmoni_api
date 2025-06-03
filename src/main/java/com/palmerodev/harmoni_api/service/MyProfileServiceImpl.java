@@ -7,6 +7,7 @@ import com.palmerodev.harmoni_api.core.exceptions.UserNotFoundException;
 import com.palmerodev.harmoni_api.model.request.SettingsRequest;
 import com.palmerodev.harmoni_api.model.response.SettingsResponse;
 import com.palmerodev.harmoni_api.repository.SettingsEntityRepository;
+import com.palmerodev.harmoni_api.repository.UserInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +16,17 @@ import org.springframework.stereotype.Service;
 public class MyProfileServiceImpl implements MyProfileService {
 
     private final SettingsEntityRepository settingsEntityRepository;
+    private final UserInfoRepository userInfoRepository;
+    private final JwtService jwtService;
 
     @Override
-    public SettingsResponse getSettingsForUser(Long userId) {
-        return settingsEntityRepository.findById(userId)
+    public SettingsResponse getSettingsForUser() {
+        var userInfo = userInfoRepository.findByName(jwtService.extractUsername())
+                                         .orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
+
+        return settingsEntityRepository.findById(userInfo.getId())
                                        .map(settingsEntity -> new SettingsResponse("success", settingsEntity.getSettingsJson(), "Settings retrieved successfully"))
-                                       .orElseThrow(() -> new SettingsNotFoundException("Settings not found for user ID: " + userId));
+                                       .orElseThrow(() -> new SettingsNotFoundException("Settings not found for user ID: " + userInfo.getId()));
     }
 
     @Override
@@ -31,14 +37,16 @@ public class MyProfileServiceImpl implements MyProfileService {
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
+        var userInfo = userInfoRepository.findByName(jwtService.extractUsername())
+                                         .orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
 
-        return settingsEntityRepository.findById(request.userId())
+        return settingsEntityRepository.findById(userInfo.getId())
                                        .map(settingsEntity -> {
                                            settingsEntity.setSettingsJson(settingsJson);
                                            settingsEntityRepository.save(settingsEntity);
                                            return new SettingsResponse("success", settingsJson, "Settings updated successfully");
                                        })
-                                       .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + request.userId(), settingsJson));
+                                       .orElseThrow(() -> new UserNotFoundException("User not found with ID: " + userInfo.getId(), settingsJson));
     }
 
 }

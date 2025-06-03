@@ -5,6 +5,9 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +18,14 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class JwtServiceImpl implements JwtService {
 
-    public static final String SECRET = "5367566859703373367639792F423F452848284D6251655468576D5A71347437";
+    @Value("${jwt.secret}")
+    public String SECRET;
+
+    private final HttpServletRequest httpServletRequest;
+
 
     @Override
     public String generateToken(String email) {
@@ -31,7 +39,7 @@ public class JwtServiceImpl implements JwtService {
                    .setSubject(email)
                    .setIssuedAt(new Date())
                    .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
-                   .signWith(getSignKey(), SignatureAlgorithm.HS256)
+                   .signWith(getSignKey(), SignatureAlgorithm.HS512)
                    .compact();
     }
 
@@ -41,7 +49,13 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String extractUsername(String token) {
+    public String extractUsername() {
+        var token = httpServletRequest.getHeader("Authorization");
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        } else {
+            return null;
+        }
         return extractClaim(token, Claims::getSubject);
     }
 
@@ -58,7 +72,7 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
+        final String username = extractUsername();
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 

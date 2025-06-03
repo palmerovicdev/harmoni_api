@@ -17,8 +17,8 @@ public interface HomeService {
 
     EmotionTrackResponse createEmotionTrack(EmotionTrackMultipleRequest emotionTrackRequest);
 
-    List<EmotionTrackResponse> getEmotionTracksByActivity(Long userId, Long activityId);
+    List<EmotionTrackResponse> getEmotionTracksByActivity(Long activityId);
 
-    List<EmotionTrackResponse> getEmotionTracks(Long userId);
+    List<EmotionTrackResponse> getEmotionTracks();
 
 }

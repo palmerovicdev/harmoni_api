@@ -11,7 +11,7 @@ public interface JwtService {
 
     String generateToken(String email);
 
-    String extractUsername(String token);
+    String extractUsername();
 
     Date extractExpiration(String token);
 

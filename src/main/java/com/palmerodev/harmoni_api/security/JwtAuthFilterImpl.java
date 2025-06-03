@@ -35,7 +35,7 @@ public class JwtAuthFilterImpl extends JwtAuthFilter {
 
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             token = authHeader.substring(7);
-            username = jwtService.extractUsername(token);
+            username = jwtService.extractUsername();
         } else {username = null;}
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {

@@ -41,6 +41,22 @@
             <version>0.11.5</version>
         </dependency>
         <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-resolver-dns-native-macos</artifactId>
+            <version>4.1.109.Final</version>
+            <classifier>osx-x86_64</classifier>
+        </dependency>
+        <dependency>
+            <groupId>org.mp4parser</groupId>
+            <artifactId>isoparser</artifactId>
+            <version>1.9.56</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mp4parser</groupId>
+            <artifactId>muxer</artifactId>
+            <version>1.9.56</version>
+        </dependency>
+        <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-impl</artifactId>
             <version>0.11.5</version>

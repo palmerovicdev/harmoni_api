@@ -12,6 +12,7 @@ public class Scheduler {
     @EventListener(ApplicationReadyEvent.class)
     public void handleEvent() {
         log.info("""
+                     \s
                      ___                ___            __  _                     __             __           __
                     /   |  ____  ____  / (_)________ _/ /_(_)___  ____     _____/ /_____ ______/ /____  ____/ /
                    / /| | / __ \\/ __ \\/ / / ___/ __ `/ __/ / __ \\/ __ \\   / ___/ __/ __ `/ ___/ __/ _ \\/ __  /\s

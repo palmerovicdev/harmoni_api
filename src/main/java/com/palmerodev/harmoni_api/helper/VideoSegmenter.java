@@ -9,5 +9,5 @@ import java.util.List;
 public interface VideoSegmenter {
     List<BufferedImage> extractFrames(MultipartFile file) throws Exception;
     File convertToTempFile(MultipartFile multipartFile) throws Exception;
-    List<byte[]> extractAudioBlocks(MultipartFile file) throws Exception;
+    List<File> extractAudioBlocks(MultipartFile file) throws Exception;
 }

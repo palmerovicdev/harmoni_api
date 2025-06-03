@@ -68,7 +68,10 @@ public class UserInfoServiceImpl implements UserInfoService {
             return new AuthResponse(
                     "success",
                     "User authenticated successfully",
-                    jwtService.generateToken(authRequest.username())
+                    jwtService.generateToken(authRequest.username()),
+                    repository.findByName(authRequest.username())
+                              .orElseThrow(() -> new UserNotFoundException("User not found: " + authRequest.username(), ""))
+                              .getId()
             );
         } else {
             try {
