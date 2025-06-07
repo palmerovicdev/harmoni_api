@@ -11,4 +11,5 @@ public record EmotionRecordResponse(List<PredictionResponse> predictions, String
     public EmotionRecordResponse(String success) {
         this(List.of(), success);
     }
+
 }
