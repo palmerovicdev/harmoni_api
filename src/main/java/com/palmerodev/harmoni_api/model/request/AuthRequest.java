@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record AuthRequest(
         String name,
-        String password
+        String password,
+        String email
 ) {
 }

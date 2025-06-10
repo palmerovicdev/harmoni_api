@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.palmerodev.harmoni_api.core.exceptions.*;
 import com.palmerodev.harmoni_api.model.response.ErrorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -14,6 +15,7 @@ import java.time.Instant;
 import java.util.List;
 
 @ControllerAdvice
+@Slf4j
 public class ExceptionHandlerConfig {
 
     @ExceptionHandler(UserNotFoundException.class)
@@ -28,7 +30,9 @@ public class ExceptionHandlerConfig {
         methodName = methodName.substring(methodName.indexOf("$") + 1, methodName.lastIndexOf("$")) + " at " + Timestamp.from(Instant.now());
         var data = "AdditionalData : " + List.of(System.currentTimeMillis() + "", ex.getJsonAdditionalData());
         try {
-            return className + "::" + methodName + " -> " + ex.getMessage() + " --- " + new ObjectMapper().writeValueAsString(data);
+            var message =  className + "::" + methodName + " -> " + ex.getMessage() + " --- " + new ObjectMapper().writeValueAsString(data);
+            log.warn(message);
+            return message;
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }

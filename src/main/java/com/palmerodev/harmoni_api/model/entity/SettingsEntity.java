@@ -23,7 +23,8 @@ public class SettingsEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(columnDefinition = "json")
+    @Lob
+    @Column(columnDefinition = "TEXT")
     private String settingsJson;
 
     @ManyToOne(cascade = CascadeType.ALL, targetEntity = UserInfo.class)

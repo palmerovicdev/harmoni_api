@@ -6,5 +6,7 @@ public record UserInfoResponse(Long id,
                                String name,
                                String email,
                                Role role,
+                               Integer age,
+                               String avatar,
                                String gender) {
 }

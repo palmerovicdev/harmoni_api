@@ -35,7 +35,10 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
 
                 .authorizeHttpRequests(auth -> auth
-                                               .requestMatchers("/auth/signUp", "/auth/signIn").permitAll()
+                                               .requestMatchers(
+                                                       "/auth/signUp", "/auth/signIn",
+                                                       "/myProfile/validateEmail/**"
+                                                       , "/myProfile/validateName/**").permitAll()
 
                                                .requestMatchers("/myProfile/**").hasAnyAuthority(Permission.CUSTOMER.name())
                                                .requestMatchers("/auth/user/**").hasAuthority(Permission.CUSTOMER.name())
@@ -62,6 +65,11 @@ public class SecurityConfig {
     }
 
     @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> userInfoRepository.findByName(username).orElseThrow(() -> new UserNotFoundException("User Not Found", ""));
+    }
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -69,11 +77,6 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return username -> userInfoRepository.findByName(username).orElseThrow(() -> new UserNotFoundException("User Not Found", ""));
     }
 
 }

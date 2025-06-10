@@ -13,7 +13,9 @@ import com.palmerodev.harmoni_api.model.response.AuthResponse;
 import com.palmerodev.harmoni_api.repository.UserInfoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -53,24 +55,40 @@ public class UserInfoServiceImpl implements UserInfoService {
                                 .name(userInfo.name())
                                 .email(userInfo.email())
                                 .gender(userInfo.gender())
+                                .age(userInfo.age())
+                                .avatar(userInfo.avatar())
                                 .password(encoder.encode(userInfo.password()))
                                 .role(userInfo.role())
                                 .build());
 
-        return this.login(new AuthRequest(userInfo.name(), userInfo.password()));
+        return this.login(new AuthRequest(userInfo.name(), userInfo.password(), userInfo.email()));
     }
 
     @Override
     public AuthResponse login(AuthRequest authRequest) {
-        var authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.name(), authRequest.password())
+        var user = repository.findByEmail(authRequest.email())
+                             .orElseThrow(() -> new UserNotFoundException("User not found: " + authRequest.name(), ""));
+        Authentication authentication;
+        try {
+            authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(user.getName(), authRequest.password())
                                                                );
+
+        } catch (BadCredentialsException e) {
+            return  new AuthResponse(
+                    "error",
+                    "Invalid credentials",
+                    null,
+                    null
+            );
+        }
+
         if (authentication.isAuthenticated()) {
             return new AuthResponse(
                     "success",
                     "User authenticated successfully",
-                    jwtService.generateToken(authRequest.name()),
-                    repository.findByName(authRequest.name())
+                    jwtService.generateToken(user.getName()),
+                    repository.findByName(user.getName())
                               .orElseThrow(() -> new UserNotFoundException("User not found: " + authRequest.name(), ""))
                               .getId()
             );

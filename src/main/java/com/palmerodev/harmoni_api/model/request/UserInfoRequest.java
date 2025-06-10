@@ -9,6 +9,9 @@ public record UserInfoRequest(
         String name,
         String email,
         String password,
+        Integer age,
+        String avatar,
+        String settings,
         Role role,
         String gender) {
 
