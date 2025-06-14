@@ -9,6 +9,7 @@ import com.palmerodev.harmoni_api.model.entity.ActivityEntity;
 import com.palmerodev.harmoni_api.model.enums.EmotionTrackType;
 import com.palmerodev.harmoni_api.model.enums.EmotionType;
 import com.palmerodev.harmoni_api.model.request.ActivityListRequest;
+import com.palmerodev.harmoni_api.model.request.ActivityRequest;
 import com.palmerodev.harmoni_api.model.request.EmotionTrackMultipleRequest;
 import com.palmerodev.harmoni_api.model.response.ActivityResponse;
 import com.palmerodev.harmoni_api.model.response.EmotionTrackResponse;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -43,18 +45,29 @@ public class HomeServiceImpl implements HomeService {
     public ActivityResponse createActivities(ActivityListRequest activityRequest) {
         var userInfo = userInfoRepository.findByName(jwtService.extractUsername())
                                          .orElseThrow(() -> new UserNotFoundException("User not found", "Username: " + jwtService.extractUsername()));
+        var activities = activityEntityRepository.findByNameInAndUserInfo_Id(
+                (activityRequest.activities()
+                                .stream()
+                                .map(ActivityRequest::name)
+                                .toList()), userInfo.getId());
 
         activityEntityRepository
                 .saveAllAndFlush(activityRequest
                                          .activities()
                                          .stream()
-                                         .map(act -> new ActivityEntity(
-                                                 null,
-                                                 act.name(),
-                                                 act.color(),
-                                                 null,
-                                                 null,
-                                                 userInfo))
+                                         .map(act -> {
+                                             boolean isActivityInDbForUser = activities.stream().anyMatch(activityEntity -> activityEntity.getName().equals(act.name()));
+
+                                             return !isActivityInDbForUser
+                                                     ? new ActivityEntity(
+                                                     null,
+                                                     act.name(),
+                                                     act.color(),
+                                                     null,
+                                                     null,
+                                                     userInfo)
+                                                     : null;
+                                         }).filter(Objects::nonNull)
                                          .toList());
         return new ActivityResponse(
                 "success",
