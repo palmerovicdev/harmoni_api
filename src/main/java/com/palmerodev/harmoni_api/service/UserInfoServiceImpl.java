@@ -7,6 +7,8 @@ import com.palmerodev.harmoni_api.core.exceptions.AuthLogicException;
 import com.palmerodev.harmoni_api.core.exceptions.UserAlreadyExistException;
 import com.palmerodev.harmoni_api.core.exceptions.UserNotFoundException;
 import com.palmerodev.harmoni_api.model.entity.UserInfo;
+import com.palmerodev.harmoni_api.model.request.ActivityListRequest;
+import com.palmerodev.harmoni_api.model.request.ActivityRequest;
 import com.palmerodev.harmoni_api.model.request.AuthRequest;
 import com.palmerodev.harmoni_api.model.request.UserInfoRequest;
 import com.palmerodev.harmoni_api.model.response.AuthResponse;
@@ -21,6 +23,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class UserInfoServiceImpl implements UserInfoService {
@@ -34,6 +38,8 @@ public class UserInfoServiceImpl implements UserInfoService {
     private final AuthenticationManager authenticationManager;
 
     private final ObjectMapper objectMapper;
+
+    private final HomeService homeService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -51,7 +57,7 @@ public class UserInfoServiceImpl implements UserInfoService {
             }
         }
 
-        repository.save(UserInfo.builder()
+        UserInfo savedUser = repository.save(UserInfo.builder()
                                 .name(userInfo.name())
                                 .email(userInfo.email())
                                 .gender(userInfo.gender())
@@ -60,8 +66,28 @@ public class UserInfoServiceImpl implements UserInfoService {
                                 .password(encoder.encode(userInfo.password()))
                                 .role(userInfo.role())
                                 .build());
+        
+        // Crear 5 actividades por defecto para el nuevo usuario
+        createDefaultActivities(savedUser);
 
         return this.login(new AuthRequest(userInfo.name(), userInfo.password(), userInfo.email()));
+    }
+
+    /**
+     * Crea 5 actividades por defecto para un nuevo usuario
+     * @param user El usuario para el cual crear las actividades
+     */
+    private void createDefaultActivities(UserInfo user) {
+        var defaultActivities = List.of(
+            new ActivityRequest("Trabajo", "#FF6B6B"),
+            new ActivityRequest("Estudio", "#4ECDC4"),
+            new ActivityRequest("Ejercicio", "#45B7D1"),
+            new ActivityRequest("Social", "#96CEB4"),
+            new ActivityRequest("Descanso", "#FFEAA7")
+        );
+        
+        var activityListRequest = new ActivityListRequest(defaultActivities);
+        homeService.createActivities(activityListRequest);
     }
 
     @Override

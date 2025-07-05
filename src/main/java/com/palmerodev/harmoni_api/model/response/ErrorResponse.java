@@ -5,13 +5,4 @@ public record ErrorResponse(
         String message
 ) {
 
-    public ErrorResponse(String status) {
-        this(status, null);
-    }
-
-    public ErrorResponse(String status, String message) {
-        this.status = status;
-        this.message = message;
-    }
-
 }

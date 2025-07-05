@@ -6,12 +6,4 @@ public record SettingsResponse(
         String message
 ) {
 
-    public SettingsResponse(String status, String message) {
-        this(status, null, message);
-    }
-
-    public SettingsResponse(String status) {
-        this(status, null, null);
-    }
-
 }

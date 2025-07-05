@@ -6,10 +6,6 @@ public record ActivityResponse(
         Object data
 ) {
 
-    public ActivityResponse() {
-        this("OK", null);
-    }
-
     public ActivityResponse(String status, Object data) {
         this(status, null, data);
     }

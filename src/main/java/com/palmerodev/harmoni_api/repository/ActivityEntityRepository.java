@@ -11,9 +11,7 @@ import java.util.List;
 @Repository
 public interface ActivityEntityRepository extends JpaRepository<ActivityEntity, Long> {
 
-    Object findAllByUserInfo(UserInfo userInfo);
-
-    List<ActivityEntity> findByNameIn(List<String> list);
+    List<ActivityEntity> findAllByUserInfo(UserInfo userInfo);
 
     List<ActivityEntity> findByNameInAndUserInfo_Id(Collection<String> names, Long userInfoId);
 

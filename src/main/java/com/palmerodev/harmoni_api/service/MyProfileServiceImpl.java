@@ -1,6 +1,5 @@
 package com.palmerodev.harmoni_api.service;
 
-import com.palmerodev.harmoni_api.core.exceptions.SettingsNotFoundException;
 import com.palmerodev.harmoni_api.core.exceptions.UserNotFoundException;
 import com.palmerodev.harmoni_api.model.entity.SettingsEntity;
 import com.palmerodev.harmoni_api.model.request.SettingsRequest;
@@ -32,7 +31,11 @@ public class MyProfileServiceImpl implements MyProfileService {
 
         return settingsEntityRepository.findById(userInfo.getId())
                                        .map(settingsEntity -> new SettingsResponse("success", settingsEntity.getSettingsJson().toString(), "Settings retrieved successfully"))
-                                       .orElseThrow(() -> new SettingsNotFoundException("Settings not found for user ID: " + userInfo.getId()));
+                                       .orElseGet(() -> {
+                                           var entity =  settingsEntityRepository.save(new SettingsEntity(null, "{}", userInfo, null, null));
+                                             return new SettingsResponse("success", entity.getSettingsJson() != null ? entity.getSettingsJson()
+                                                     : "{}", "Settings initialized successfully");
+                                       });
     }
 
     @Override
